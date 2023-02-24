@@ -56,4 +56,4 @@ def motion(event):
 root.bind("<Motion>", motion)
 
 
-#root.mainloop()
+root.mainloop()
