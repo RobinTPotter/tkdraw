@@ -6,7 +6,13 @@ from PIL import ImageDraw
 root = tkinter.Tk()
 root.geometry("600x300")
 
-myCanvas = tkinter.Canvas(root, bg="blue", height=600, width=300, tki=None, img=None, draw=None, imc=None)
+def clearup():
+    print("nob")
+    root.destroy()
+
+root.protocol("WM_DELETE_WINDOW", clearup)
+
+myCanvas = tkinter.Canvas(root, bg="blue", height=600, width=300) #, tki=None, img=None, draw=None, imc=None)
 myCanvas.img = Image.new(size=[600,300],mode="RGB")
 myCanvas.draw = ImageDraw.Draw(myCanvas.img)
 #myCanvas.draw.line((0, 0) + myCanvas.img.size, fill=128)
@@ -33,7 +39,7 @@ def motion(event):
             myCanvas.create_image((0,0),image=myCanvas.tki, anchor="nw")
             last = [event.x, event.y]
     if event.state | 1024 == event.state: print("but2")
-    print(f"{event.x},{event.y},{event.state}")
+    #print(f"{event.x},{event.y},{event.state}")
     #print(dir(event))
 
 root.bind("<Motion>", motion)
