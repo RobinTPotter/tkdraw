@@ -1,58 +1,69 @@
 import tkinter
 from PIL import Image, ImageTk, ImageDraw
+import uuid
 
-root = tkinter.Tk()
-root.geometry("600x300")
+class Scribbler():
 
-# init canvas 
-myCanvas = tkinter.Canvas(root, bg="blue", height=600, width=300) #, tki=None, img=None, draw=None, imc=None)
+    def __init__(self, _root):
 
-# new pillow img and attach to canvas
-myCanvas.img = Image.new(size=[600,300],mode="RGBA")
-myCanvas.draw = ImageDraw.Draw(myCanvas.img)
-#myCanvas.draw.line((0, 0) + myCanvas.img.size, fill=128)
-#myCanvas.draw.line((0, myCanvas.img.size[1], myCanvas.img.size[0], 0), fill=128)
-myCanvas.tki = ImageTk.PhotoImage(myCanvas.img, height=myCanvas.img.height, width=myCanvas.img.width)
-myCanvas.imc = myCanvas.create_image((0,0),image=myCanvas.tki, anchor="nw")	
+        self.id = str(uuid.uuid4())
+        self.root = _root
+        self.master = tkinter.Toplevel(self.root)
+        self.master.id =self.id
+        self.frame = tkinter.Frame(self.master)
 
-myCanvas.pack(expand=True,fill="both")
+        self.width, self.height = 600, 300
 
-# clearup code run 
+        #self.root = tkinter.Tk()
+        self.master.geometry(f"{self.width}x{self.height}")
 
-def clearup():
-    print("nob")
-    myCanvas.img.save("exit.png")
-    root.destroy()
+        # init canvas 
+        self.main_canvas = tkinter.Canvas(self.master, bg="blue") #, height=200, width=200) #, tki=None, img=None, draw=None, imc=None)
 
-# intercept the delete window and call function
+        # new pillow img and attach to canvas
+        self.main_canvas.img = Image.new(size=[self.width,self.height],mode="RGBA")
+        self.main_canvas.draw = ImageDraw.Draw(self.main_canvas.img)
+        self.main_canvas.tki = ImageTk.PhotoImage(self.main_canvas.img, height=self.height, width=self.width)
+        self.main_canvas.imc = self.main_canvas.create_image((0,0),image=self.main_canvas.tki, anchor="nw")	
 
-root.protocol("WM_DELETE_WINDOW", clearup)
+        self.main_canvas.pack(expand=True,fill="both")
+        self.last = None
 
+        self.master.bind("<Motion>", self.motion)
 
+        # clearup code run 
+        # intercept the delete window and call function
 
-last = None
+        self.master.protocol("WM_DELETE_WINDOW", self.clearup)
+        self.frame.pack()
 
+    def clearup(self):
+        print("nob")
+        self.main_canvas.img.save(f"exit-{self.master.id}.png")
+        self.master.destroy()
+        if len([c.id for c in list(self.root.children.values())])==0:
+            self.root.destroy()
 
-def motion(event):
-    global myCanvas, draw, image_container, last, img, tkimg 
-    if event.state == 8: last = None
-    if event.state | 256 == event.state: # bitwise check on button press
-        if last is None:
-            last = [event.x, event.y]
-        else:
-            #tkimg = ImageTk.PhotoImage(img, height=img.height, width=img.width)
-            # update pillow image rather than the image in the canvas
-            myCanvas.draw.line((last[0], last[1], event.x,event.y), fill=(255,255,0,255))
-            #i1.paste(i2, mask=i2) 
-            # redo the tkimage
-            myCanvas.tki = ImageTk.PhotoImage(myCanvas.img, height=myCanvas.img.height, width=myCanvas.img.width)
-            myCanvas.create_image((0,0),image=myCanvas.tki, anchor="nw")
-            last = [event.x, event.y]
-    if event.state | 1024 == event.state: print("but2")
-    #print(f"{event.x},{event.y},{event.state}")
-    #print(dir(event))
+    def motion(self, event):
+        if event.state == 8: last = None
+        if event.state | 256 == event.state: # bitwise check on button press
+            if self.last is None:
+                self.last = [event.x, event.y]
+            else:
+                #tkimg = ImageTk.PhotoImage(img, height=img.height, width=img.width)
+                # update pillow image rather than the image in the canvas
+                self.main_canvas.draw.line((self.last[0], self.last[1], event.x,event.y), fill=(255,255,0,255))
+                #i1.paste(i2, mask=i2) 
+                # redo the tkimage
+                self.main_canvas.tki = ImageTk.PhotoImage(self.main_canvas.img, height=self.height, width=self.width)
+                self.main_canvas.create_image((0,0),image=self.main_canvas.tki, anchor="nw")
+                self.last = [event.x, event.y]
+        if event.state | 1024 == event.state: print("but2")
+        #print(f"{event.x},{event.y},{event.state}")
+        #print(dir(event))
 
-root.bind("<Motion>", motion)
-
-
-root.mainloop()
+if __name__=="__main__":
+    root = tkinter.Tk()
+    root.withdraw()
+    app = Scribbler(root)
+    root.mainloop()
