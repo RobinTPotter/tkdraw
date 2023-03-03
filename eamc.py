@@ -4,8 +4,9 @@ import uuid
 
 class Scribbler():
 
-    def __init__(self, _root):
+    def __init__(self, _root, main=False):
 
+        self.main = main
         self.id = str(uuid.uuid4())
         self.root = _root
         self.master = tkinter.Toplevel(self.root)
@@ -41,11 +42,12 @@ class Scribbler():
         print("nob")
         self.main_canvas.img.save(f"exit-{self.master.id}.png")
         self.master.destroy()
-        if len([c.id for c in list(self.root.children.values())])==0:
-            self.root.destroy()
+        if self.main:
+            if len([c.id for c in list(self.root.children.values())])==0:
+                self.root.destroy()
 
     def motion(self, event):
-        if event.state == 8: last = None
+        if event.state == 8: self.last = None
         if event.state | 256 == event.state: # bitwise check on button press
             if self.last is None:
                 self.last = [event.x, event.y]
@@ -65,5 +67,7 @@ class Scribbler():
 if __name__=="__main__":
     root = tkinter.Tk()
     root.withdraw()
-    app = Scribbler(root)
+    app = Scribbler(root, main=True)
     root.mainloop()
+else:
+    root = tkinter.Tk()
