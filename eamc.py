@@ -2,6 +2,8 @@ import tkinter
 from PIL import Image, ImageTk, ImageDraw
 import uuid
 
+# a pointless change which should ideally remain
+
 class Scribbler():
 
     def __init__(self, _root, main=False):
